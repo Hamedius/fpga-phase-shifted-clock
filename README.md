@@ -1,129 +1,192 @@
 # EPS Lab 07 – Digital Phase-Shifted Clock Generator (VHDL)
 
 This project contains the VHDL designs developed for **LAB07** of the course  
-**Electronics Programmable Systems (EPS)**. The lab focuses on generating a **clock divided by 16** and a **phase‑shifted version** of this clock using fully synchronous digital logic suitable for FPGA implementation.
+**Electronics Programmable Systems (EPS)**.  
+The objective is to design a synchronous digital circuit that generates:
 
-The design is intended for synthesis on a **Xilinx Spartan‑3 XC3S200 (VQ100, –4)** device.
+- `CLK_L`  → a clock signal with frequency **CLK ÷ 16**  
+- `CLK_SF` → a **phase-shifted version** of `CLK_L`, where the shift is programmable over **0–360°** using a 4-bit input `DIG_DELAY`
 
----
-
-## Lab Objective
-
-Design a synchronous digital circuit that, given a system clock `CLK`:
-
-- Generates a slower clock `CLK_L` whose frequency is **`CLK / 16`**.  
-- Generates a second output `CLK_SF` with:
-  - The **same frequency** as `CLK_L`
-  - A **programmable phase shift** in the range **0–360°**, controlled by a 4‑bit digital delay input `DIG_DELAY`
-- Updates the phase relationship **only when a load signal is asserted**, keeping the phase difference fixed until the next load.
-
-The repository contains two main VHDL source files corresponding to **part A** and **part B** of the lab.
+Both designs are written for synthesis on a  
+**Xilinx Spartan-3 XC3S200 (VQ100, –4)** FPGA device.
 
 ---
 
-## Repository Structure
+## 📁 Repository Structure
 
 ```text
-eps-lab07-phase-shifted-clock/
+fpga-phase-shifted-clock/
 ├── README.md
+├── docs/
+│   └── EPS_LAB07_20220510.pdf
 └── src/
-    ├── EPS07a.vhd    -- Part A: base implementation
-    └── LAB07B.vhd    -- Part B: extended/refined implementation
+    ├── EPS07a.vhd     -- Part A implementation
+    └── LAB07B.vhd     -- Part B implementation
 ```
-
-- `EPS07a.vhd` – first implementation of the LAB07.A entity (clock divider + programmable phase shift).  
-- `LAB07B.vhd` – second implementation used for LAB07.B, which refines and extends the behavior specified in the lab sheet using an alternative internal structure.
 
 ---
 
-## Part A – EPS07a.vhd (LAB07.A)
+## 📘 Documentation
+
+The full lab specification is included in:
+
+```text
+docs/EPS_LAB07_20220510.pdf
+```
+
+It describes the assignment requirements, input/output behavior, timing, and FPGA target device.
+
+---
+
+## 🧩 Part A – EPS07a.vhd
 
 ### Functional Description
 
 `EPS07a` implements:
 
-- A **÷16 clock divider** to obtain `CLK_L` from the system clock `CLK`  
-- A **phase‑shift generator** that produces `CLK_SF`, a copy of `CLK_L` shifted in phase according to the value on `DIG_DELAY`  
-- A **load mechanism** that latches a new delay value only when a `LOAD` signal is asserted
+- A **clock divider** generating `CLK_L = CLK ÷ 16` from the system clock `CLK`
+- A **programmable phase shifter** generating `CLK_SF`
+- A `LOAD` mechanism that latches a new delay value (`DIG_DELAY`)  
+  and keeps the phase constant until the next load pulse
 
-Typical ports (names may vary slightly depending on the exact file):
+Typical ports (names may differ slightly depending on your version):
 
-- `CLK`        – input system clock  
-- `RESET`      – reset input  
-- `DIG_DELAY`  – 4‑bit digital delay control  
-- `LOAD`       – strobe to latch the new delay  
-- `CLK_L`      – divided clock output (`CLK / 16`)  
-- `CLK_SF`     – phase‑shifted clock output
+- `CLK` — system clock  
+- `RESET` — reset input  
+- `DIG_DELAY(3 downto 0)` — 4-bit phase shift control  
+- `LOAD` — strobe to update delay  
+- `CLK_L` — divided clock output  
+- `CLK_SF` — phase-shifted clock output  
 
 ### Internal Architecture (Conceptual)
 
-- A counter implements division by 16 to generate `CLK_L`.  
-- A digital delay line / counter offset, controlled by `DIG_DELAY`, determines when `CLK_SF` toggles relative to `CLK_L`.  
-- The delay configuration is stored in a register updated on `LOAD`, ensuring that the phase shift remains constant until the next load event.
-
-All logic is synchronous to `CLK`, making the design suitable for FPGA synthesis and timing analysis.
+- A synchronous counter divides `CLK` by 16 to generate `CLK_L`.  
+- A delay/offset register defines the phase shift of `CLK_SF` relative to `CLK_L`.  
+- The delay register is updated only when `LOAD` is asserted, so the phase relationship stays constant between load events.  
+- All logic is synchronous to `CLK`, fully synthesizable and suitable for static timing analysis.
 
 ---
 
-## Part B – LAB07B.vhd (LAB07.B)
+## 🧩 Part B – LAB07B.vhd
 
 ### Purpose
 
-`LAB07B.vhd` contains the **second implementation** for the same functional specification, as requested in part **B** of the lab:
+`LAB07B.vhd` implements the **same external behavior** as Part A but using a **different internal design approach**.
 
-- It still generates `CLK_L` and `CLK_SF` with the same frequency and programmable phase shift.  
-- It uses a **different internal structure** (for example, a different way of handling counters, phase accumulation, or state machine) to achieve the same behavior.
+It is used to:
 
-This second version is useful for:
+- Demonstrate an alternative synchronous architecture for the same problem  
+- Compare resource usage (LUTs, FFs, etc.)  
+- Compare maximum clock frequency and timing margins between two valid solutions  
 
-- Comparing resource usage (LUTs, FFs, etc.)  
-- Comparing maximum achievable clock frequency  
-- Evaluating different design trade‑offs while satisfying the same specification.
+### Entity Behavior
 
-### Entity Overview
+Part B:
 
-The entity typically includes:
-
-- `CLK`        – input system clock  
-- `RESET`      – reset input  
-- `DIG_DELAY`  – 4‑bit digital delay control  
-- `LOAD`       – strobe to latch the new delay  
-- `CLK_L`      – divided clock output  
-- `CLK_SF`     – phase‑shifted clock output
-
-The architecture in `LAB07B.vhd` reorganizes the internal signals and counters but preserves the required external behavior.
+- Generates `CLK_L = CLK ÷ 16`  
+- Generates `CLK_SF` with the same frequency and programmable phase shift  
+- Uses the same `DIG_DELAY` and `LOAD` interface to control phase shift  
+- Keeps the phase fixed until the next `LOAD`
 
 ---
 
-## Usage
+## ⏱ Waveform Diagrams (Conceptual)
 
-1. Create a new FPGA project (ISE/Vivado) targeting **Spartan‑3 XC3S200, VQ100, –4**.  
-2. Add the desired source file(s) from the `src/` folder:
-   - `EPS07a.vhd` for the LAB07.A version  
-   - `LAB07B.vhd` for the LAB07.B version  
-3. Set the top module accordingly (either `EPS07a` or `EPS07B`, depending on the entity name used in the file).  
-4. Optionally create a VHDL testbench to drive:
-   - `CLK` (system clock)  
-   - `RESET`  
-   - `DIG_DELAY` (various delay values)  
-   - `LOAD` pulses  
-5. Run behavioral simulation to verify:
-   - Correct division by 16 for `CLK_L`  
-   - Correct phase shift behavior for `CLK_SF`  
-6. Run synthesis, implementation, and timing analysis to obtain:
-   - Maximum operating frequency  
-   - Resource usage for each version (A and B)
+The following ASCII timing diagrams illustrate the expected behavior of the design.
 
----
+### 1. Clock Division: `CLK` → `CLK_L = CLK ÷ 16`
 
-## Notes
+```text
+CLK      : ┌─┐   ┌─┐   ┌─┐   ┌─┐   ┌─┐   ┌─┐   ┌─┐   ┌─┐   ┌─┐   ┌─┐   ...
+          │ │   │ │   │ │   │ │   │ │   │ │   │ │   │ │   │ │   │ │
+        ──┘ └───┘ └───┘ └───┘ └───┘ └───┘ └───┘ └───┘ └───┘ └───┘ └────
 
-- Both designs are written in synthesizable VHDL.  
-- All logic is synchronous to the main clock `CLK`.  
-- The phase‑shift resolution and range are determined by the 4‑bit `DIG_DELAY` input, which covers the full 0–360° range for the period of `CLK_L`.
+CLK_L    : ┌─────────┐           ┌─────────┐
+          │         │           │         │
+        ──┘         └───────────┘         └───────────  (period = 16 × T_CLK)
+```
+
+`CLK_L` toggles every 8 cycles of `CLK`, giving a full period of 16 `CLK` cycles.
 
 ---
 
-## Author
+### 2. Phase Shift with `DIG_DELAY`
 
-- **Hamed Nahvi**
+Assume:
+
+- `DIG_DELAY = 0` → `CLK_SF` is in phase with `CLK_L`  
+- `DIG_DELAY = 4` → `CLK_SF` lags `CLK_L` by 4 counts (90° for a 16‑step delay)  
+
+```text
+DIG_DELAY = "0000" (0)
+LOAD      : ____┌─┐_______________________________________________
+              ^  value "0000" is loaded here
+
+CLK_L     :     ┌───────┐       ┌───────┐       ┌───────┐
+               │       │       │       │       │       │
+        _______┘       └_______┘       └_______┘       └____
+
+CLK_SF    :     ┌───────┐       ┌───────┐       ┌───────┐
+               │       │       │       │       │       │
+        _______┘       └_______┘       └_______┘       └____
+             (in phase with CLK_L when DIG_DELAY = 0)
+```
+
+Now with a non‑zero delay:
+
+```text
+DIG_DELAY = "0100" (4)
+LOAD      : _____________┌─┐_______________________________________
+                          ^  value "0100" is loaded here
+
+CLK_L     :         ┌───────┐       ┌───────┐       ┌───────┐
+                   │       │       │       │       │       │
+        ___________┘       └_______┘       └_______┘       └____
+
+CLK_SF    :             ┌───────┐       ┌───────┐       ┌───────┐
+                       │       │       │       │       │       │
+        _______________┘       └_______┘       └_______┘       └
+              <---- 4 internal delay steps ---->
+                       (phase shift relative to CLK_L)
+```
+
+After `LOAD` is asserted, `CLK_SF` transitions are shifted by a number of internal counter steps proportional to `DIG_DELAY`.  
+The phase relationship remains constant until the next `LOAD` pulse.
+
+---
+
+## ▶️ How to Use
+
+1. Create a new FPGA project (Xilinx ISE/Vivado) targeting  
+   **Spartan-3 XC3S200, VQ100, –4**.
+2. Add into the project:
+   - `src/EPS07a.vhd` for the Part A implementation, or  
+   - `src/LAB07B.vhd` for the Part B implementation.
+3. Set the top‑level entity accordingly (`EPS07a` or `LAB07B`, depending on your code).  
+4. Create a VHDL testbench to drive:
+   - `CLK` (system clock)
+   - `RESET`
+   - `DIG_DELAY`
+   - `LOAD`
+5. Run behavioral simulation:
+   - Verify division by 16 on `CLK_L`
+   - Verify phase shift of `CLK_SF` when `DIG_DELAY` and `LOAD` change
+6. Run synthesis, implementation, and timing analysis:
+   - Check maximum clock frequency
+   - Compare area and timing between Part A and Part B
+
+---
+
+## 🎯 Learning Outcomes
+
+- Synchronous digital design in VHDL  
+- Clock division and clock‑like signal generation  
+- Programmable digital phase shifting using counters and delay logic  
+- FPGA synthesis and timing analysis on a Spartan‑3 device  
+- Comparison of different architectures implementing the same specification
+
+---
+
+## 👤 Author
+
+**Hamed Nahvi**
