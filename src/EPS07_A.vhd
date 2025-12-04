@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Company: University of Palermo
+-- Engineer: Hamed Nahvi
 -- 
 -- Create Date:    15:05:18 05/28/2024 
 -- Design Name: 
@@ -84,4 +84,5 @@ CLK_L <= L_OUT;
 CLK_SF <= SF_OUT;
 
 end Behavioral;
+
 
