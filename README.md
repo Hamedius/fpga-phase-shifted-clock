@@ -1,4 +1,4 @@
-# EPS Lab 07 – Digital Phase-Shifted Clock Generator (VHDL)
+# fpga Digital Phase Shifted Clock Generator (VHDL)
 
 This project contains the VHDL designs developed for **LAB07** of the course  
 **Electronics Programmable Systems (EPS)**.  
@@ -12,7 +12,7 @@ Both designs are written for synthesis on a
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```text
 fpga-phase-shifted-clock/
@@ -26,7 +26,7 @@ fpga-phase-shifted-clock/
 
 ---
 
-## 📘 Documentation
+## Documentation
 
 The full lab specification is included in:
 
@@ -38,7 +38,7 @@ It describes the assignment requirements, input/output behavior, timing, and FPG
 
 ---
 
-## 🧩 Part A – EPS07a.vhd
+## Part A – EPS07a.vhd
 
 ### Functional Description
 
@@ -67,7 +67,7 @@ Typical ports (names may differ slightly depending on your version):
 
 ---
 
-## 🧩 Part B – LAB07B.vhd
+## Part B – LAB07B.vhd
 
 ### Purpose
 
@@ -90,7 +90,7 @@ Part B:
 
 ---
 
-## ⏱ Waveform Diagrams (Conceptual)
+## Waveform Diagrams (Conceptual)
 
 The following ASCII timing diagrams illustrate the expected behavior of the design.
 
@@ -155,7 +155,7 @@ The phase relationship remains constant until the next `LOAD` pulse.
 
 ---
 
-## ▶️ How to Use
+## How to Use
 
 1. Create a new FPGA project (Xilinx ISE/Vivado) targeting  
    **Spartan-3 XC3S200, VQ100, –4**.
@@ -177,7 +177,7 @@ The phase relationship remains constant until the next `LOAD` pulse.
 
 ---
 
-## 🎯 Learning Outcomes
+## Learning Outcomes
 
 - Synchronous digital design in VHDL  
 - Clock division and clock‑like signal generation  
@@ -187,6 +187,6 @@ The phase relationship remains constant until the next `LOAD` pulse.
 
 ---
 
-## 👤 Author
+## Author
 
 **Hamed Nahvi**
